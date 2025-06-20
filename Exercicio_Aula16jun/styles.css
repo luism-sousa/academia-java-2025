@@ -1,0 +1,33 @@
+.imagemLogo {
+    width: 20vw;
+    height: 5vw;
+    display: flex;
+    justify-content: center;
+    margin: 2em auto;
+}
+
+h3 {
+    text-align: center;
+    font-weight: bold;
+}
+
+#formulario {
+    background-color: cyan;
+    position: relative;
+    padding: 2em;
+    margin-left: 20em;
+    margin-right: 20em;
+}
+
+.container {
+    text-align: center;
+}
+
+.btn-primary {
+    width: 10em;
+    background-color: red;
+}
+
+.btn-primary:hover {
+    background-color: darkred;
+}
