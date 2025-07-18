@@ -114,7 +114,6 @@ function getImagePath(tipo, nomeProduto) {
 
 // Função para adicionar os produtos a tabela "Resumo do Pedido"
 function adicionarProduto(prod) {
-    console.log("ding ding");
     let produtoSelecionado = prod.closest(".card");
     let nomeProduto = produtoSelecionado.querySelector(".card-title").innerText;
     let precoProduto = produtoSelecionado.querySelector(".card-text.fw-light.text-center").innerText;

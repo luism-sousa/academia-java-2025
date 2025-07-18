@@ -1,0 +1,9 @@
+body {
+  background-image: url("./img/background-image.jpg");
+}
+
+.fixed-img {
+  height: 20vw;
+  object-fit: contain;
+  width: 100%;
+ }
