@@ -1,4 +1,4 @@
-package pt.upacademy.examples;
+package pt.upacademy.examples.Example1;
 
 import java.util.Scanner;
 

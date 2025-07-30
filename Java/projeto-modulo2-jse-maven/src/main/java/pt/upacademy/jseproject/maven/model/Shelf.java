@@ -1,4 +1,4 @@
-package pt.upacademy.jseproject.model;
+package pt.upacademy.jseproject.maven.model;
 
 /*
  * Uma prateleira pode ter 0 ou 1 produto
@@ -49,8 +49,12 @@ public class Shelf extends Entity {
 		this.rentPrice = rentPrice;
 	}
 
-	public void setProducts(Product product) {
-		this.product = product;
+	public void setProduct(Product product) {
+		if (this.product == null) {
+			this.product = product;
+		} else {
+			System.out.println("Erro! Esta prateleira já possui um produto");
+		}
 	}
 	// endregion
 	
@@ -61,7 +65,7 @@ public class Shelf extends Entity {
 //	                (shelf.getProduct() != null ? "Produto #" + shelf.getProduct().getId() : "vazia") +
 //	                ("| Preço aluguer: " + shelf.getRentPrice()));
 		return "Prateleira ID: " + id + " | " +
-				(product != null ? product.toString() : "Sem produtos ") +
+				(product != null ? "Produto ID: " + product.getId() + " | Nome Produto: " + product.getName() + " " : "Sem produtos ") +
 				"| Capacidade: " + capacity + " " +
 				"| Preço de Aluguer: " + rentPrice + "€ / dia";
 	}

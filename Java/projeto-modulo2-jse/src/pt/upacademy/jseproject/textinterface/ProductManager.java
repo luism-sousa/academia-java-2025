@@ -1,20 +1,13 @@
 package pt.upacademy.jseproject.textinterface;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import pt.upacademy.jseproject.model.Product;
-import pt.upacademy.jseproject.model.Shelf;
+import pt.upacademy.jseproject.repositories.ProductRepository;
 
 public class ProductManager {
-	private List<Product> products = new ArrayList<>();
-	private List<Shelf> shelves = new ArrayList<>();
-	private Scanner sc;
-	
-	public ProductManager(Scanner sc) {
-		this.sc = sc;
-	}
+	private ProductRepository productRepository = ProductRepository.getInstance();
+	private Scanner sc = new Scanner(System.in);
 	
 	public void showMenu() {
 		boolean mostrarMenu = true;
@@ -83,10 +76,6 @@ public class ProductManager {
 		Product newProduct = new Product(productName, productDiscount, productVAT, productPVP);
 		
 		// TODO: Mostrar lista de Shelves disponiveis onde posso adicionar o produto
-	}
-	
-	public void addProductToShelf() {
-		
 	}
 
 	public void editProduct() {

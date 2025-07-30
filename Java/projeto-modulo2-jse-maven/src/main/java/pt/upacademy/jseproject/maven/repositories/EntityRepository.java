@@ -1,4 +1,4 @@
-package pt.upacademy.jseproject.repositories;
+package pt.upacademy.jseproject.maven.repositories;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import pt.upacademy.jseproject.model.Entity;
+import pt.upacademy.jseproject.maven.model.Entity;
 
 /**
  * Prática 2 - Pt. 3<br>
@@ -43,11 +43,10 @@ public abstract class EntityRepository<T extends Entity>  {
 		return nextId;
 	}
 	
-//	@Override
-//	public List<T> getAll() {
-//		// Retornar todos os elementos da "database"
-//		return new ArrayList<>(database.values());
-//	}
+	public List<T> getAllEntities() {
+		// Retornar todos os elementos da "database"
+		return new ArrayList<>(database.values());
+	}
 	
 	public List<Long> getAllIds() {
 		return new ArrayList<>(database.keySet());

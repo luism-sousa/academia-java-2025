@@ -1,4 +1,4 @@
-package pt.upacademy.jseproject.model;
+package pt.upacademy.jseproject.maven.model;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -17,8 +17,6 @@ import java.util.ArrayList;
  */
 
 public class Product extends Entity{
-	private static long count = 0;
-
 	private String name;
 	private double discount;
 	private int vat;
@@ -81,7 +79,7 @@ public class Product extends Entity{
 	public String toString() {
 		return "Produto ID: " + id + " | " +
 				"Nome Produto: " + name + 
-				(!shelvesId.isEmpty() ? " | Colocado na(s) prateleira(s): " + shelvesId.toString() : " | Não colocado em prateleira ") +
+				(!shelvesId.isEmpty() ? " | Colocado na(s) prateleira(s): " + shelvesId.toString() + " " : " | Não colocado em prateleira ") +
 				"| Desconto: " + discount + "% " +
 				"| IVA: " + vat + "% " +
 				"| Preço: " + pvp + "€";

@@ -1,4 +1,4 @@
-package pt.upacademy.jseproject.textinterface;
+package pt.upacademy.jseproject.maven.textinterface;
 
 /**
  * Main
