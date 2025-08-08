@@ -1,5 +1,7 @@
 package pt.upacademy.jseproject.maven.repositories;
 
+import java.util.List;
+
 import pt.upacademy.jseproject.maven.model.Shelf;
 import pt.upacademy.jseproject.maven.repositories.interfaces.ShelfRepositoryCRUD_Interface;
 
@@ -28,8 +30,12 @@ public class ShelfRepository extends EntityRepository<Shelf> implements ShelfRep
 
 	@Override
 	public Shelf getEntity(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		return super.getById(id);
+	}
+	
+	@Override
+	public List<Shelf> getAllEntities() {
+		return super.getAllEntities();
 	}
 
 }

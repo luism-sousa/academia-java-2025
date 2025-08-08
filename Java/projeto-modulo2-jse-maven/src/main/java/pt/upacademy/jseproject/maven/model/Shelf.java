@@ -1,5 +1,7 @@
 package pt.upacademy.jseproject.maven.model;
 
+import java.util.Locale;
+
 /*
  * Uma prateleira pode ter 0 ou 1 produto
  * Um produto pode estar presente em 0 ou “n” prateleiras
@@ -18,6 +20,11 @@ public class Shelf extends Entity {
 	private int capacity;
 	private double rentPrice;
 	private Product product;	// Agregação
+	
+	// Construtor por defeito
+	public Shelf() {
+		
+	}
 
 	// Construtor
 	public Shelf(int capacity, double rentPrice) {
@@ -49,24 +56,27 @@ public class Shelf extends Entity {
 		this.rentPrice = rentPrice;
 	}
 
-	public void setProduct(Product product) {
-		if (this.product == null) {
+	public boolean setProduct(Product product) {
+		if (product == null) {
+			// Remover produto
+			this.product = null;
+			return true;
+		} else if (this.product == null) {
+			// Adicionar produto
 			this.product = product;
+			return true;
 		} else {
 			System.out.println("Erro! Esta prateleira já possui um produto");
+			return false;
 		}
 	}
 	// endregion
 	
-	// TODO Fazer override do método 'ToString'
 	@Override
 	public String toString() {
-//		 System.out.println(" - ID: " + id + " | Conteúdo: " +
-//	                (shelf.getProduct() != null ? "Produto #" + shelf.getProduct().getId() : "vazia") +
-//	                ("| Preço aluguer: " + shelf.getRentPrice()));
 		return "Prateleira ID: " + id + " | " +
 				(product != null ? "Produto ID: " + product.getId() + " | Nome Produto: " + product.getName() + " " : "Sem produtos ") +
 				"| Capacidade: " + capacity + " " +
-				"| Preço de Aluguer: " + rentPrice + "€ / dia";
+				"| Preço de Aluguer: " + String.format(Locale.US, "%.2f", rentPrice) + "€ / dia";
 	}
 }

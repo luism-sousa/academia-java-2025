@@ -1,6 +1,10 @@
 package pt.upacademy.jseproject.maven.model;
 
 import java.util.List;
+import java.util.Locale;
+
+import pt.upacademy.jseproject.maven.utils.VatRate;
+
 import java.util.ArrayList;
 
 /*
@@ -16,15 +20,20 @@ import java.util.ArrayList;
 	- PVP (Preço de Venda ao Público)
  */
 
-public class Product extends Entity{
+public class Product extends Entity {
 	private String name;
 	private double discount;
-	private int vat;
+	private VatRate vat;
 	private double pvp;
 	private List<Long> shelvesId; // Associação
 
+	// Construtor por defeito
+	public Product() {
+		
+	}
+
 	// Construtor
-	public Product(String name, double discount, int vat, double pvp) {
+	public Product(String name, double discount, VatRate vat, double pvp) {
 		this.name = name;
 		this.discount = discount;
 		this.vat = vat;
@@ -32,7 +41,7 @@ public class Product extends Entity{
 		this.shelvesId = new ArrayList<>();
 	}
 
-	// region Getters	
+	// region Getters
 	public String getName() {
 		return name;
 	}
@@ -41,14 +50,14 @@ public class Product extends Entity{
 		return discount;
 	}
 
-	public int getVat() {
+	public VatRate getVat() {
 		return vat;
 	}
 
 	public double getPvp() {
 		return pvp;
 	}
-	
+
 	public List<Long> getShelvesId() {
 		return shelvesId;
 	}
@@ -58,30 +67,31 @@ public class Product extends Entity{
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public void setDiscount(double discount) {
 		this.discount = discount;
 	}
 
-	public void setVat(int vat) {
+	public void setVat(VatRate vat) {
 		this.vat = vat;
 	}
 
 	public void setPvp(double pvp) {
 		this.pvp = pvp;
 	}
-	
+
 	public void setShelvesId(List<Long> shelvesId) {
 		this.shelvesId = shelvesId;
 	}
+
 	// endregion
-	
+
 	@Override
 	public String toString() {
-		return "Produto ID: " + id + " | " +
-				"Nome Produto: " + name + 
-				(!shelvesId.isEmpty() ? " | Colocado na(s) prateleira(s): " + shelvesId.toString() + " " : " | Não colocado em prateleira ") +
-				"| Desconto: " + discount + "% " +
-				"| IVA: " + vat + "% " +
-				"| Preço: " + pvp + "€";
+		return "Produto ID: " + id + " | " + "Nome Produto: " + name
+				+ (!shelvesId.isEmpty() ? " | Colocado na(s) prateleira(s): " + shelvesId.toString() + " "
+						: " | Não colocado em prateleira ")
+				+ "| Desconto: " + discount + "% " + "| IVA: " + vat + " " + "| Preço: "
+				+ String.format(Locale.US, "%.2f", pvp) + "€";
 	}
 }

@@ -14,7 +14,7 @@ public class ReadShelves extends State {
 		System.out.println("\n== < Prateleira > - [Consultar prateleira] ==\n");
 
 		if (SS.isEmpty()) {
-			System.out.println("\nNão existem prateleira na base de dados!\n");
+			System.out.println("\nNão existem prateleiras na base de dados!\n");
 			return 0;
 		}
 		

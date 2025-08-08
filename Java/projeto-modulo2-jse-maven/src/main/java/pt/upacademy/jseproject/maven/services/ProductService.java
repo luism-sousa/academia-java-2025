@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import pt.upacademy.jseproject.maven.model.Product;
 import pt.upacademy.jseproject.maven.repositories.ProductRepository;
+import pt.upacademy.jseproject.maven.utils.ProductValidation;
 
 public class ProductService extends EntityService<Product> {
 
@@ -12,10 +13,12 @@ public class ProductService extends EntityService<Product> {
 	
 	@Override
 	public Product create(Product product) {
+		ProductValidation.validateProductData(product);	
+		
 		productDB.addEntity(product);
 		return product;
 	}
-
+	
 	public Product findByName(String name) {
 		return productDB.findByName(name);
 	}
@@ -28,6 +31,29 @@ public class ProductService extends EntityService<Product> {
 	@Override
 	public List<Long> findAll() {
 		return productDB.getAllIds();
+	}
+	
+	@Override
+	public List<Product> getAllEntities() {
+		return productDB.getAllEntities();
+	}
+	
+	@Override
+	public Product update(Product product) {
+		ProductValidation.validateProductData(product);
+		
+		if (product.getId() == null) {
+			throw new IllegalArgumentException("[Error] - Invalid Product ID! Unable to update!");
+		}
+		
+		Product existingProduct = productDB.getById(product.getId());
+		ProductValidation.validateProductExists(existingProduct, product.getId());
+		
+		Product testProduct = productDB.findByName(product.getName());
+		ProductValidation.validateProductNameUnique(existingProduct, testProduct);
+		
+		productDB.updateEntity(product);
+		return product;
 	}
 	
 	@Override

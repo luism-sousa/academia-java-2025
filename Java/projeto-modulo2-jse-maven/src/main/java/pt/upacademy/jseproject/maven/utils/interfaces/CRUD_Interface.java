@@ -10,6 +10,6 @@ public abstract interface CRUD_Interface<T extends Entity> {
 	Long addEntity(T entity);	
 	T getEntity(Long id);	
 	List<T> getAllEntities();	
-	void editEntity(T entity);	
+	void updateEntity(T entity);	
 	void removeEntity(Long id);
 }

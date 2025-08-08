@@ -1,7 +1,6 @@
 package pt.upacademy.jseproject.maven.repositories;
 
 import java.util.List;
-import java.util.Map;
 
 import pt.upacademy.jseproject.maven.model.Product;
 import pt.upacademy.jseproject.maven.repositories.interfaces.ProductRepositoryCRUD_Interface;

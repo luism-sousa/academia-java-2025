@@ -28,7 +28,7 @@ import pt.upacademy.jseproject.maven.model.Entity;
  * @param <T>
  */
 public abstract class EntityRepository<T extends Entity>  {
-	protected Map<Long, T> database = new HashMap<Long, T>();
+	protected final Map<Long, T> database = new HashMap<Long, T>();
 	private Long maxId = 0L;
 	
 	private Long getNextId() {
@@ -56,20 +56,30 @@ public abstract class EntityRepository<T extends Entity>  {
 		T entity = database.get(id);
 		// Caso a "Entity" não exista na "database", lança uma Exception
 		if (entity == null) {
-			throw new NoSuchElementException("Entity doesn't exist in DB!");
+			throw new NoSuchElementException("Entity não existe na DB!");
 		}
 		// Se chegou aqui, é porque existe => retorno a Entity encontrada
 		return entity;
 	}
 	
-	public void editEntity(T entity) {
-		Long id = entity.getId();
-		// Caso o ID recebido seja válido e a "Entity" exista na "database"..
-		if (id != null && database.containsKey(id)) {
-			System.out.print("Introduza o novo ID: ");
-			database.put(id, entity);
+	public void updateEntity(T entity) {
+		if (entity == null) {
+			throw new IllegalArgumentException("Entity não existe na DB!");
 		}
-		// Caso uma das condições não seja cumprida..
+		
+		Long id = entity.getId();
+		// Caso o ID recebido não seja válido
+		if (id == null) {
+			throw new IllegalArgumentException("ID da Entity inválido!");
+		}
+		
+		// Caso a "Entity" não exista na "database"..
+		if (!database.containsKey(id)) {
+			throw new NoSuchElementException("Entity com ID: " + id + " não encontrada!");
+		}
+		
+		// Caso o ID recebido seja válido e a "Entity" exista na "database"..
+		database.put(id, entity);
 	}
 	
 	public void removeEntity(Long id) {
@@ -83,5 +93,11 @@ public abstract class EntityRepository<T extends Entity>  {
 	
 	public boolean isEmpty() {
 		return database.isEmpty();
+	}
+	
+	// Limpar database
+	public void clear() {
+		database.clear();
+		maxId = 0L;
 	}
 }

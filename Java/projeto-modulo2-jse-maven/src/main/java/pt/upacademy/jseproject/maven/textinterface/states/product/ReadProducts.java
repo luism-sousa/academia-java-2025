@@ -3,7 +3,6 @@ package pt.upacademy.jseproject.maven.textinterface.states.product;
 import java.util.NoSuchElementException;
 
 import pt.upacademy.jseproject.maven.model.Product;
-import pt.upacademy.jseproject.maven.repositories.ProductRepository;
 import pt.upacademy.jseproject.maven.services.ProductService;
 import pt.upacademy.jseproject.maven.textinterface.states.State;
 
