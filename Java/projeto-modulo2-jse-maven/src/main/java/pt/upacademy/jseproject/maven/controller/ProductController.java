@@ -1,7 +1,7 @@
 package pt.upacademy.jseproject.maven.controller;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -19,11 +19,13 @@ import javax.ws.rs.core.UriInfo;
 
 import pt.upacademy.jseproject.maven.model.Product;
 import pt.upacademy.jseproject.maven.services.ProductService;
+import pt.upacademy.jseproject.maven.services.ShelfService;
 import pt.upacademy.jseproject.maven.utils.ProductValidation;
 
 @Path("/products")
 public class ProductController {
 	private ProductService PS = new ProductService();
+	private ShelfService SS = new ShelfService();
 
 	@Context
 	protected UriInfo context;
@@ -39,8 +41,10 @@ public class ProductController {
 	// [Getter] - Get all products
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Product> getAll() {
-		return PS.getAllEntities();
+	public Response getAll() {
+		//return PS.getAllEntities();
+		List<Product> products = PS.getAllEntities();
+		return Response.ok(products).build();
 	}
 	
 	// [Getter] - Get one specific Product by Name
@@ -64,7 +68,7 @@ public class ProductController {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createProduct(Product product, @Context UriInfo uriInfo) {
-		ProductValidation.validateProductData(product);
+		ProductValidation.validateProductData(product, PS);
 		Product newProduct = PS.create(product);
 		UriBuilder builder = uriInfo.getAbsolutePathBuilder().path(newProduct.getId().toString());
 		return Response.created(builder.build()).entity(newProduct).build();
@@ -73,22 +77,22 @@ public class ProductController {
 
 	// region [PUT]
 	@PUT
-    @Path("/{productId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateProduct(@QueryParam("productId") Long productId, Product product) {
-		try {	          
-	        Product updatedProduct = PS.update(product);
-	        return Response.ok(updatedProduct).build();
-	    } catch (NoSuchElementException e) {
-	        return Response.status(Response.Status.NOT_FOUND)
-	                .entity("Product with ID: " + productId + " not found!")
-	                .build();
-	    } catch (IllegalArgumentException e) {
-	        return Response.status(Response.Status.BAD_REQUEST)
-	                .entity(e.getMessage())
-	                .build();
-	    }
+    public Response updateProduct(Product product) {
+		if (product.getId() == null) {
+			throw new IllegalArgumentException("[Error] - Product ID must be provided in the body");
+		}
+		Product productToUpdate = PS.findById(product.getId());
+		ProductValidation.validateProductExists(productToUpdate, product.getId());
+		ProductValidation.validateProductData(product, PS, product.getId());
+		
+        productToUpdate.setName(product.getName());
+        productToUpdate.setDiscount(product.getDiscount());
+        productToUpdate.setPvp(product.getPvp());
+        productToUpdate.setVat(product.getVat());
+        Product updatedProduct = PS.update(productToUpdate);
+        return Response.ok(updatedProduct).build();
     }
 	// endregion
 
@@ -96,15 +100,22 @@ public class ProductController {
 	// [DELETE] - Delete one Product
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response removeProduct(@QueryParam("productId") Long id) {
-		if (PS.delete(id) == true) {
-			return Response.ok()
-					.entity("Product with ID: " + id + " removed successfully")
-					.build();
+	public Response removeProduct(Product product) {
+		if (product.getId() == null) {
+			throw new IllegalArgumentException("[Error] - Product ID must be provided in the body");
 		}
-		return Response.status(Response.Status.NOT_FOUND)
-				.entity("Product with ID: " + id + " not found! Unable to delete")
-				.build();
+		Product productToDelete = PS.findById(product.getId());
+	    ProductValidation.validateProductExists(productToDelete, product.getId());
+
+	    if (productToDelete.getShelvesId() != null && !productToDelete.getShelvesId().isEmpty()) {
+	        List<Long> shelvesToRemove = new ArrayList<Long>(productToDelete.getShelvesId());
+	        for (Long shelfId : shelvesToRemove) {
+	            SS.removeProductFromShelf(productToDelete, shelfId);
+	        }
+	    }
+
+	    PS.delete(product.getId());
+	    return Response.ok().entity("Product with ID: " + product.getId() + " removed successfully").build();
 	}
 	// endregion
 }

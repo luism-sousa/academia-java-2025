@@ -1,6 +1,5 @@
 package pt.upacademy.jseproject.maven.services;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -57,29 +56,37 @@ public class ShelfService extends EntityService<Shelf> {
 //		}
 //	}
 
-	public boolean removeProductFromShelves(Product product) {
-		List<Long> shelfIds = new ArrayList<>(product.getShelvesId());
-		boolean removed = false;
+	public boolean removeProductFromShelf(Product product, Long shelfIdToRemove) {
+	    if (product == null || shelfIdToRemove == null) {
+	        return false;
+	    }
 
-		for (Long shelfId : shelfIds) {
-			Shelf shelf = findById(shelfId);
-			if (shelf != null && product.equals(shelf.getProduct())) {
-				if (product != null) {
-					// Remover a referencia à Prateleira no Produto
-					product.getShelvesId().remove(shelf.getId());
+	    List<Long> shelfIds = product.getShelvesId();
+	    if (shelfIds == null || !shelfIds.contains(shelfIdToRemove)) {
+	        return false; // Product not linked to this shelf
+	    }
 
-					// Remover a referencia do Produto na Prateleira
-					shelf.setProduct(null);
+	    Shelf shelf = findById(shelfIdToRemove);
+	    if (shelf != null && shelf.getProduct() != null
+	            && product.getId() != null
+	            && product.getId().equals(shelf.getProduct().getId())) {
 
-					// Atualiza a Shelf no repositório
-					shelfDB.updateEntity(shelf);
+	        // Remove the shelf reference from the product
+	        shelfIds.remove(shelfIdToRemove);
+	        product.setShelvesId(shelfIds);
 
-					removed = true;
-				}
-			}
-		}
-		return removed;
+	        // Remove the product reference from the shelf
+	        shelf.setProduct(null);
+
+	        // Update the shelf in the repository
+	        shelfDB.updateEntity(shelf);
+
+	        return true;
+	    }
+
+	    return false;
 	}
+
 
 	@Override
 	public Shelf update(Shelf shelf) {
@@ -93,7 +100,7 @@ public class ShelfService extends EntityService<Shelf> {
 		Shelf existingShelf = shelfDB.getById(shelf.getId());
 		if (existingShelf == null) {
 			throw new NoSuchElementException("[Error] - Shelf not found. Unable to update!");
-		}		
+		}
 
 		// Update specific fields
 		existingShelf.setCapacity(shelf.getCapacity());

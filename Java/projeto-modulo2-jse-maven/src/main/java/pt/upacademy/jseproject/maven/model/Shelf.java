@@ -14,9 +14,7 @@ import java.util.Locale;
  	- Preço de aluguer de localização (diário)
  */
 
-public class Shelf extends Entity {
-	private static long count = 0;
-	
+public class Shelf extends Entity {	
 	private int capacity;
 	private double rentPrice;
 	private Product product;	// Agregação
@@ -28,7 +26,6 @@ public class Shelf extends Entity {
 
 	// Construtor
 	public Shelf(int capacity, double rentPrice) {
-		this.id = ++count;	// ++count para o 1º elemento não começar com ID '0'
 		this.capacity = capacity;
 		this.rentPrice = rentPrice;
 	}

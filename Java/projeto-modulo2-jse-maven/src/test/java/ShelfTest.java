@@ -1,6 +1,7 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -14,7 +15,6 @@ import pt.upacademy.jseproject.maven.repositories.ShelfRepository;
 import pt.upacademy.jseproject.maven.services.ShelfService;
 
 public class ShelfTest {
-
     private ShelfService SS;
 
     @BeforeEach
@@ -34,9 +34,10 @@ public class ShelfTest {
 
     @Test
     void testReadShelfById() {
-    	Shelf newShelf = SS.create(new Shelf(100, 50.0));
+        Shelf newShelf = SS.create(new Shelf(100, 50.0));
         Shelf foundShelf = SS.findById(newShelf.getId());
 
+        assertNotNull(foundShelf); 
         assertEquals(newShelf.getCapacity(), foundShelf.getCapacity());
     }
 
@@ -47,6 +48,7 @@ public class ShelfTest {
         SS.update(newShelf);
 
         Shelf updatedShelf = SS.findById(newShelf.getId());
+        assertNotNull(updatedShelf);
         assertEquals(200, updatedShelf.getCapacity());
     }
 
@@ -56,7 +58,7 @@ public class ShelfTest {
         boolean isDeleted = SS.delete(newShelf.getId());
 
         assertTrue(isDeleted);
-        assertThrows(NoSuchElementException.class, () -> SS.findById(newShelf.getId()));
+        assertNull(SS.findById(newShelf.getId()));
     }
 
     @Test
@@ -66,14 +68,14 @@ public class ShelfTest {
 
         assertEquals(2, SS.getAllEntities().size());
     }
-    
+
     /*
-	* ## Fail Tests ##
-	*/
+     * ## Fail Tests ##
+     */
     @Test
-    void testFindNonExistentShelfThrowsException() {
+    void testFindNonExistentShelfReturnsNull() {
         Long id = 50L;
-        assertThrows(NoSuchElementException.class, () -> SS.findById(id));
+        assertNull(SS.findById(id));
     }
 
     @Test
@@ -88,7 +90,7 @@ public class ShelfTest {
         shelf.setId(50L); // ID inexistente
 
         NoSuchElementException exception = assertThrows(NoSuchElementException.class, () -> SS.update(shelf));
-        
-        assertTrue(exception.getMessage().contains("Entity não existe na DB!"));
+
+        assertTrue(exception.getMessage().contains("Shelf not found"));
     }
 }

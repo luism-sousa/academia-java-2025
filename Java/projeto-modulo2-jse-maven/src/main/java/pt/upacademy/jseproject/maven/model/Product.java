@@ -29,7 +29,7 @@ public class Product extends Entity {
 
 	// Construtor por defeito
 	public Product() {
-		
+		this.shelvesId = new ArrayList<>();
 	}
 
 	// Construtor
@@ -87,11 +87,12 @@ public class Product extends Entity {
 	// endregion
 
 	@Override
-	public String toString() {
-		return "Produto ID: " + id + " | " + "Nome Produto: " + name
-				+ (!shelvesId.isEmpty() ? " | Colocado na(s) prateleira(s): " + shelvesId.toString() + " "
-						: " | Não colocado em prateleira ")
-				+ "| Desconto: " + discount + "% " + "| IVA: " + vat + " " + "| Preço: "
-				+ String.format(Locale.US, "%.2f", pvp) + "€";
-	}
+    public String toString() {
+        String shelfInfo = (shelvesId != null && !shelvesId.isEmpty())
+                ? " | Colocado na(s) prateleira(s): " + shelvesId.toString() + " "
+                : " | Não colocado em prateleira ";
+        return "Produto ID: " + id + " | " + "Nome Produto: " + name + shelfInfo
+                + "| Desconto: " + discount + "% " + "| IVA: " + vat + " " + "| Preço: "
+                + String.format(Locale.US, "%.2f", pvp) + "€";
+    }
 }

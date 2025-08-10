@@ -15,6 +15,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import pt.upacademy.jseproject.maven.model.Product;
@@ -43,20 +44,22 @@ public class ShelfController {
 
 	// [GET] - Get all shelves
 	@GET
-	public List<Shelf> getAll() {
-		return SS.getAllEntities();
+	public Response getAll() {
+		//return SS.getAllEntities();
+		List<Shelf> shelves = SS.getAllEntities();
+		return Response.ok(shelves).build();
 	}
 
 	// [GET] - Get shelf by ID
 	@GET
-	@Path("/shelf")
+	@Path("/{shelfId}") 
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getShelfById(@QueryParam("shelfId") Long id) {
+	public Response getShelfById(@PathParam("shelfId") Long id) {
 		Shelf shelf = SS.findById(id);
 		if (shelf == null) {
 			return Response.status(Response.Status.NOT_FOUND).entity("[Error] - Shelf with ID: " + id + " not found!").build();
 		}
-		return Response.ok(id).build();
+		return Response.ok(shelf).build();
 	}
 	// endregion
 
@@ -65,58 +68,69 @@ public class ShelfController {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Shelf createShelf(Shelf s) {
-		return SS.create(s);
+	public Response createShelf(Shelf shelf, @Context UriInfo uriInfo) {
+		ShelfValidation.validateShelfData(shelf);
+		Shelf newShelf = SS.create(shelf);
+		UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder().path(newShelf.getId().toString());
+		return Response.created(uriBuilder.build()).entity(newShelf).build();
 	}
 	// endregion
 
 	// region [PUT]
 	@PUT
-	@Path("/{shelfId}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Shelf updateShelf(@QueryParam("shelfId") Long shelfId, Shelf shelf) {
-		if (shelfId == null) {
-			throw new IllegalArgumentException("[Error] - Shelf ID is required to update!");
+	public Response updateShelf(Shelf shelf) {
+		if (shelf.getId() == null) {
+			throw new IllegalArgumentException("[Error] - Shelf ID must be provided in the body");
 		}
-		
-		return SS.update(shelf);
+	    Shelf existingShelf = SS.findById(shelf.getId());
+	    ShelfValidation.validateShelfExists(existingShelf, shelf.getId());
+
+	    // Validate incoming data fields (capacity / rentPrice)
+	    ShelfValidation.validateShelfData(shelf);
+	    
+	    Shelf updatedShelf = SS.update(shelf);
+	    return Response.ok(updatedShelf).build();
 	}
 	
 	@PUT
-	@Path("/{shelfId}/product")
+	@Path("/product")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addProductToShelf(@PathParam("shelfId") Long shelfId, Product product) {
-		Shelf shelf = SS.findById(shelfId);
-		ShelfValidation.validateShelfExists(shelf, shelfId);
-		ShelfValidation.validateShelfIsAvailable(shelf);
-			
-		Product productToAssociate;
-		if (product.getId() != null && product.getId() >= 0) {
-			productToAssociate = PS.findById(product.getId());
-			// Retificar
-			ShelfValidation.validateProductToAssociate(productToAssociate, shelfId);
-		} else {			
-			ShelfValidation.validateProductToAssociate(product, null);
-			productToAssociate = PS.create(product);
+	public Response addProductToShelf(@QueryParam("shelfId") Long shelfId, Product product) {
+		if (shelfId == null) {
+			throw new IllegalArgumentException("[Error] - Shelf ID must be provided");
 		}
+	    if (product == null || product.getId() == null) {
+	        throw new IllegalArgumentException("[Error] - Product ID must be provided to assign to a shelf");
+	    }
 
-		shelf.setProduct(productToAssociate);
-		List<Long> shelfIds = productToAssociate.getShelvesId();
-		if (shelfIds == null) {
-			shelfIds = new ArrayList<>();
-		}
+	    // Find shelf & validate
+	    Shelf shelf = SS.findById(shelfId);
+	    ShelfValidation.validateShelfExists(shelf, shelfId);
+	    ShelfValidation.validateShelfIsAvailable(shelf);
 
-		if (!shelfIds.contains(shelf.getId())) {
-			shelfIds.add(shelfId);
-			productToAssociate.setShelvesId(shelfIds);
-		}
+	    // Find the product and validate
+	    Product productToAssociate = PS.findById(product.getId());
+	    ShelfValidation.validateProductToAssociate(productToAssociate, product.getId());
 
-		SS.update(shelf);
-		PS.update(productToAssociate);
+	    // Assign product to shelf
+	    shelf.setProduct(productToAssociate);
+	    SS.update(shelf);
 
-		return Response.ok(shelf).build();
+	    List<Long> shelfIds = productToAssociate.getShelvesId();
+	    if (shelfIds == null) {
+	        shelfIds = new ArrayList<>();
+	    }
+	    if (!shelfIds.contains(shelfId)) {
+	        shelfIds.add(shelfId);
+	        productToAssociate.setShelvesId(shelfIds);
+	        PS.update(productToAssociate);
+	    }
+
+	    // Return updated Shelf
+	    return Response.ok(shelf).build();
 	}
 	// endregion
 
@@ -124,11 +138,17 @@ public class ShelfController {
 	// [DELETE] - Delete one Shelf
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response removeProduct(@QueryParam("shelfId") Long shelfId) {
-		Shelf shelf = SS.findById(shelfId);
-		ShelfValidation.validateShelfExists(shelf, shelfId);
-		SS.delete(shelfId);
-		return Response.ok().build();
+	public Response removeShelf(Shelf shelf) {
+		if (shelf.getId() == null) {
+			throw new IllegalArgumentException("[Error] - Shelf ID must be provided in the body");
+		}
+		Shelf shelfToRemove = SS.findById(shelf.getId());
+		ShelfValidation.validateShelfExists(shelfToRemove, shelf.getId());
+		if (shelfToRemove.getProduct() != null) {
+			SS.removeProductFromShelf(shelfToRemove.getProduct(), shelf.getId());
+		}
+		SS.delete(shelf.getId());
+		return Response.ok().entity("Shelf with ID: " + shelf.getId() + " removed successfully").build();
 	}
 	// endregion
 }

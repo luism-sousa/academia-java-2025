@@ -53,13 +53,7 @@ public abstract class EntityRepository<T extends Entity>  {
 	}
 	
 	public T getById(Long id) {
-		T entity = database.get(id);
-		// Caso a "Entity" não exista na "database", lança uma Exception
-		if (entity == null) {
-			throw new NoSuchElementException("Entity não existe na DB!");
-		}
-		// Se chegou aqui, é porque existe => retorno a Entity encontrada
-		return entity;
+		return database.get(id);
 	}
 	
 	public void updateEntity(T entity) {

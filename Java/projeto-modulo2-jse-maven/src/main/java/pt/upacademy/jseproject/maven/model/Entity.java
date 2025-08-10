@@ -1,6 +1,6 @@
 package pt.upacademy.jseproject.maven.model;
 
-public class Entity {
+public abstract class Entity {
 	protected Long id;	// Protected para ter acesso ao ID nas minhas sub-classes
 
 	public Long getId() {
